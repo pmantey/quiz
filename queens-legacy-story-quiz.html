@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queens Legacy Story Quiz | Queens Don't Hide</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep-purple: #1A0A2E;
+    --royal-gold: #C9A227;
+    --gold-light: #E8C547;
+    --gold-dim: #8B6F1A;
+    --white: #FFFFFF;
+    --lavender: #C9B8E8;
+    --lavender-dim: #7A6899;
+    --off-white: #F9F5EE;
+    --dark-card: #120820;
+    --mid-purple: #2D1554;
+    --text-body: #E8E0F0;
+    --text-muted: #9B8FBF;
+    --card-bg: rgba(45,21,84,0.4);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--deep-purple);
+    color: var(--text-body);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    line-height: 1.8;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(201,162,39,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(201,184,232,0.05) 0%, transparent 60%),
+      linear-gradient(160deg, #0D0618 0%, #1A0A2E 50%, #120820 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .quiz-shell {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px 80px;
+  }
+
+  /* ── HEADER ── */
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeDown 0.8s ease both;
+  }
+  .quiz-brand {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--royal-gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .quiz-brand::before, .quiz-brand::after {
+    content: '';
+    width: 30px;
+    height: 1px;
+    background: var(--royal-gold);
+    opacity: 0.5;
+  }
+  .quiz-crown {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 8px;
+    animation: crownDrop 1s cubic-bezier(0.34,1.56,0.64,1) both 0.2s;
+  }
+  .quiz-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(24px, 5vw, 42px);
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  .quiz-title em {
+    background: linear-gradient(135deg, var(--royal-gold), var(--gold-light), var(--royal-gold));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s linear infinite 1s;
+    font-style: italic;
+  }
+  .quiz-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(15px, 2.5vw, 19px);
+    font-style: italic;
+    color: var(--lavender);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── CARD ── */
+  .quiz-card {
+    background: linear-gradient(135deg, rgba(18,8,32,0.95) 0%, rgba(45,21,84,0.5) 100%);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 6px;
+    padding: clamp(28px, 5vw, 52px);
+    width: 100%;
+    max-width: 660px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,162,39,0.05);
+  }
+  .quiz-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--royal-gold), transparent);
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    margin-bottom: 32px;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .progress-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--royal-gold);
+    text-transform: uppercase;
+  }
+  .progress-count {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+  }
+  .progress-track {
+    height: 2px;
+    background: rgba(201,162,39,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--royal-gold), var(--gold-light));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ── QUESTION ── */
+  .q-screen { display: none; }
+  .q-screen.active { display: block; animation: fadeSlide 0.4s ease both; }
+
+  .q-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--royal-gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+  .q-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(20px, 3.5vw, 28px);
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.35;
+    margin-bottom: 32px;
+  }
+  .q-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 20px;
+    margin-top: -20px;
+  }
+
+  /* ── OPTIONS ── */
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    background: rgba(201,162,39,0.03);
+    border: 1px solid rgba(201,162,39,0.15);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+  }
+  .opt:hover {
+    background: rgba(201,162,39,0.07);
+    border-color: rgba(201,162,39,0.4);
+    transform: translateX(4px);
+  }
+  .opt.chosen {
+    background: rgba(201,162,39,0.12);
+    border-color: var(--royal-gold);
+    transform: translateX(4px);
+  }
+  .opt-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(201,162,39,0.4);
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .opt.chosen .opt-dot {
+    border-color: var(--royal-gold);
+    background: var(--royal-gold);
+  }
+  .opt.chosen .opt-dot::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: var(--deep-purple);
+    border-radius: 50%;
+  }
+  .opt-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(15px, 2.2vw, 18px);
+    color: var(--text-body);
+    line-height: 1.5;
+  }
+  .opt.chosen .opt-text { color: var(--white); }
+
+  /* ── BUTTONS ── */
+  .btn-next {
+    display: block;
+    width: 100%;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, var(--royal-gold) 0%, var(--gold-light) 50%, var(--royal-gold) 100%);
+    background-size: 200% auto;
+    color: var(--deep-purple);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .btn-next.ready {
+    opacity: 1;
+    pointer-events: all;
+    animation: pulseGold 2s ease-in-out infinite;
+  }
+  .btn-next.ready:hover {
+    background-position: right center;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(201,162,39,0.4);
+  }
+
+  /* ── INTRO SCREEN ── */
+  #screen-intro {
+    display: block;
+    animation: fadeSlide 0.6s ease both;
+  }
+  .intro-promises {
+    list-style: none;
+    margin: 24px 0 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .intro-promises li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(15px, 2vw, 18px);
+    color: var(--text-body);
+    line-height: 1.5;
+  }
+  .intro-promises li::before {
+    content: '✦';
+    color: var(--royal-gold);
+    font-size: 11px;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .intro-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    margin-top: 16px;
+  }
+  .btn-start {
+    display: block;
+    width: 100%;
+    padding: 18px 24px;
+    background: linear-gradient(135deg, var(--royal-gold) 0%, var(--gold-light) 50%, var(--royal-gold) 100%);
+    background-size: 200% auto;
+    color: var(--deep-purple);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: pulseGold 2.5s ease-in-out infinite;
+  }
+  .btn-start:hover {
+    background-position: right center;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(201,162,39,0.4);
+  }
+
+  /* ── RESULTS SCREEN ── */
+  #screen-result { display: none; }
+  #screen-result.active { display: block; animation: fadeSlide 0.6s ease both; }
+
+  .result-hero {
+    text-align: center;
+    padding: 40px 0 32px;
+    border-bottom: 1px solid rgba(201,162,39,0.15);
+    margin-bottom: 32px;
+  }
+  .result-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--royal-gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .result-icon {
+    font-size: 52px;
+    display: block;
+    margin-bottom: 16px;
+    animation: crownDrop 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .result-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 7vw, 56px);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--royal-gold), var(--gold-light), var(--royal-gold));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s linear infinite;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .result-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-style: italic;
+    color: var(--lavender);
+    margin-bottom: 20px;
+  }
+  .result-greeting {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(17px, 2.5vw, 21px);
+    color: var(--text-body);
+    font-style: italic;
+    line-height: 1.6;
+    padding: 20px 0;
+    border-top: 1px solid rgba(201,162,39,0.1);
+    margin-top: 16px;
+  }
+
+  .result-section {
+    margin-bottom: 28px;
+    padding: 24px;
+    background: rgba(201,162,39,0.04);
+    border: 1px solid rgba(201,162,39,0.12);
+    border-radius: 4px;
+  }
+  .result-section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--royal-gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .result-section p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(16px, 2.2vw, 19px);
+    color: var(--text-body);
+    line-height: 1.75;
+  }
+
+  .result-steps {
+    list-style: none;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .result-steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(15px, 2vw, 17px);
+    color: var(--text-body);
+    line-height: 1.5;
+  }
+  .result-steps li::before {
+    content: '✦';
+    color: var(--royal-gold);
+    font-size: 10px;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  /* ── OFFER BLOCK ── */
+  .offer-block {
+    margin-top: 40px;
+    background: linear-gradient(135deg, #1A0A2E 0%, #2D1554 100%);
+    border: 1px solid rgba(201,162,39,0.35);
+    border-radius: 6px;
+    padding: clamp(28px, 5vw, 48px);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(201,162,39,0.08);
+  }
+  .offer-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--royal-gold), transparent);
+  }
+  .offer-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--royal-gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .offer-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 4vw, 34px);
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+  .offer-headline em { color: var(--royal-gold); font-style: italic; }
+  .offer-body {
+    font-size: clamp(14px, 1.8vw, 16px);
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 24px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .offer-includes {
+    list-style: none;
+    margin: 0 0 28px;
+    text-align: left;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .offer-includes li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-body);
+    line-height: 1.5;
+  }
+  .offer-includes li::before {
+    content: '✦';
+    color: var(--royal-gold);
+    font-size: 10px;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  .offer-divider {
+    width: 60px;
+    height: 1px;
+    background: rgba(201,162,39,0.3);
+    margin: 24px auto;
+  }
+  .offer-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 10vw, 72px);
+    font-weight: 700;
+    color: var(--royal-gold);
+    line-height: 1;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .offer-price-note {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 28px;
+  }
+  .offer-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--royal-gold) 0%, var(--gold-light) 50%, var(--royal-gold) 100%);
+    background-size: 200% auto;
+    color: var(--deep-purple);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(12px, 1.8vw, 15px);
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 18px 40px;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: pulseGold 2.5s ease-in-out infinite;
+    display: block;
+    width: 100%;
+  }
+  .offer-btn:hover {
+    background-position: right center;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 50px rgba(201,162,39,0.4);
+  }
+  .offer-security {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 16px;
+  }
+
+  .testimonial-pull {
+    margin: 28px 0;
+    padding: 20px 24px;
+    background: rgba(201,184,232,0.05);
+    border-left: 3px solid var(--lavender-dim);
+    border-radius: 0 4px 4px 0;
+    text-align: left;
+  }
+  .testimonial-pull p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(16px, 2.2vw, 19px);
+    font-style: italic;
+    color: var(--lavender);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .testimonial-pull cite {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-style: normal;
+  }
+
+  .retake-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+  }
+  .retake-link:hover { color: var(--lavender); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes crownDrop {
+    0% { opacity: 0; transform: translateY(-30px) scale(0.8); }
+    60% { transform: translateY(4px) scale(1.05); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes pulseGold {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(201,162,39,0); }
+    50% { box-shadow: 0 0 24px 4px rgba(201,162,39,0.25); }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--deep-purple); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 520px) {
+    .quiz-shell { padding: 24px 14px 60px; }
+    .quiz-card { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<div class="quiz-shell">
+
+  <!-- HEADER -->
+  <header class="quiz-header">
+    <span class="quiz-crown">👑</span>
+    <div class="quiz-brand">Queens Don't Hide</div>
+    <h1 class="quiz-title">Discover Your<br><em>Legacy Story Archetype</em></h1>
+    <p class="quiz-subtitle">In 5 minutes, find out which story from your midlife journey should become your bestselling book.</p>
+  </header>
+
+  <!-- QUIZ CARD -->
+  <div class="quiz-card">
+
+    <!-- INTRO SCREEN -->
+    <div id="screen-intro">
+      <p class="q-eyebrow">Seven honest questions. One powerful revelation.</p>
+      <p class="q-text">Your story is buried inside you.<br>Let us find out which one deserves to be your bestselling book.</p>
+      <ul class="intro-promises">
+        <li>Discover your unique story archetype from 6 possibilities</li>
+        <li>Understand exactly WHY you have been hiding your story</li>
+        <li>See WHO needs your story and why they are waiting</li>
+        <li>Get your personalized next steps to start writing</li>
+      </ul>
+      <button class="btn-start" onclick="QDH.startQuiz()">Reveal My Story Archetype &rarr;</button>
+      <p class="intro-note">Takes about 5 minutes. No wrong answers. Choose the one that feels most true.</p>
+    </div>
+
+    <!-- PROGRESS (hidden on intro/result) -->
+    <div class="progress-wrap" id="progress-wrap" style="display:none;">
+      <div class="progress-meta">
+        <span class="progress-label">Your Legacy Discovery</span>
+        <span class="progress-count" id="progress-count">Question 1 of 7</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- QUESTION SCREENS -->
+    <div id="questions-wrap" style="display:none;">
+
+      <!-- Q1 -->
+      <div class="q-screen" id="q0">
+        <p class="q-eyebrow">Question 1 of 7</p>
+        <p class="q-text">When you look back at your life, which chapter has marked you most deeply?</p>
+        <p class="q-note">Choose the one that feels most true.</p>
+        <div class="options-list">
+          <div class="opt" onclick="QDH.pick(0,0,'A')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">My health journey. Illness, pain, and a body that tested my faith every single day.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(0,1,'B')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">The season my entire life collapsed and I had to rebuild myself from nothing.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(0,2,'C')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">Years of invisible battles that no one around me fully saw or understood.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(0,3,'D')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">The moment I woke up in midlife and no longer recognized the woman in the mirror.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(0,4,'E')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">Decades of faithful ministry and service. Always the support, never the spotlight.</span>
+          </div>
+        </div>
+        <button class="btn-next" id="next0" onclick="QDH.advance(0)">Next Question &rarr;</button>
+      </div>
+
+      <!-- Q2 -->
+      <div class="q-screen" id="q1">
+        <p class="q-eyebrow">Question 2 of 7</p>
+        <p class="q-text">Which story is still sitting inside you, the one you have never fully told?</p>
+        <p class="q-note">Choose the one that feels most true.</p>
+        <div class="options-list">
+          <div class="opt" onclick="QDH.pick(1,0,'A')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">How I kept serving and kept believing while my body was fighting me every step of the way.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(1,1,'B')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">How I rose from the ashes of my worst season into someone I am finally proud to be.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(1,2,'C')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">How I fought invisible battles in silence and survived what no one around me knew.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(1,3,'D')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">How I finally gave myself permission to live for me, not just for everyone else.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(1,4,'E')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">How God has been forming a message in me for years that I have been too afraid to speak.</span>
+          </div>
+        </div>
+        <button class="btn-next" id="next1" onclick="QDH.advance(1)">Next Question &rarr;</button>
+      </div>
+
+      <!-- Q3 -->
+      <div class="q-screen" id="q2">
+        <p class="q-eyebrow">Question 3 of 7</p>
+        <p class="q-text">What do the women who know you best say about you most often?</p>
+        <p class="q-note">Choose the one that feels most true.</p>
+        <div class="options-list">
+          <div class="opt" onclick="QDH.pick(2,0,'A')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">"You are the strongest woman I have ever known."</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(2,1,'B')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">"I cannot believe how far you have come from where you started."</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(2,2,'C')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">"You carry so much and you never let it show."</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(2,3,'D')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">"You have poured yourself out for everyone. When is it your turn?"</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(2,4,'E')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">"You are the backbone behind everything. The one who makes it all work."</span>
+          </div>
+        </div>
+        <button class="btn-next" id="next2" onclick="QDH.advance(2)">Next Question &rarr;</button>
+      </div>
+
+      <!-- Q4 -->
+      <div class="q-screen" id="q3">
+        <p class="q-eyebrow">Question 4 of 7</p>
+        <p class="q-text">If you are honest, what is the real reason you have not written your book yet?</p>
+        <p class="q-note">Choose the one that feels most true.</p>
+        <div class="options-list">
+          <div class="opt" onclick="QDH.pick(3,0,'A')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">I did not think a story about illness and suffering was inspiring. Just heavy.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(3,1,'B')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">I am still carrying shame about the mess that came before my comeback.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(3,2,'C')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">I thought my quiet invisible battles were not dramatic enough to matter to anyone.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(3,3,'D')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">I never felt like I had permission to take up that much space in the world.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(3,4,'E')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">I was afraid that stepping out would disrupt my husband, my church, or my role.</span>
+          </div>
+        </div>
+        <button class="btn-next" id="next3" onclick="QDH.advance(3)">Next Question &rarr;</button>
+      </div>
+
+      <!-- Q5 -->
+      <div class="q-screen" id="q4">
+        <p class="q-eyebrow">Question 5 of 7</p>
+        <p class="q-text">If your book could reach just one woman, who would she be?</p>
+        <p class="q-note">Choose the one that feels most true.</p>
+        <div class="options-list">
+          <div class="opt" onclick="QDH.pick(4,0,'A')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">A woman in the middle of a health crisis who needs to know she is not alone.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(4,1,'B')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">A woman whose world just fell apart and she cannot see any way forward.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(4,2,'C')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">A woman fighting silent battles, feeling completely invisible and unseen.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(4,3,'D')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">A woman who has given everything to everyone and has nothing left for herself.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(4,4,'E')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">A woman serving faithfully behind the scenes, aching to step into her own calling.</span>
+          </div>
+        </div>
+        <button class="btn-next" id="next4" onclick="QDH.advance(4)">Next Question &rarr;</button>
+      </div>
+
+      <!-- Q6 -->
+      <div class="q-screen" id="q5">
+        <p class="q-eyebrow">Question 6 of 7</p>
+        <p class="q-text">Which of these feels most like a word God has been speaking over your life?</p>
+        <p class="q-note">Choose the one that feels most true.</p>
+        <div class="options-list">
+          <div class="opt" onclick="QDH.pick(5,0,'A')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">"Your suffering is not wasted. It is your ministry."</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(5,1,'B')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">"What burned was not the end. It was the beginning."</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(5,2,'C')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">"The battles you fought in secret. I saw every one of them."</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(5,3,'D')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">"This season is yours. Stop waiting. The time is now."</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(5,4,'E')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">"I called you. Not just the role you have been playing."</span>
+          </div>
+        </div>
+        <button class="btn-next" id="next5" onclick="QDH.advance(5)">Next Question &rarr;</button>
+      </div>
+
+      <!-- Q7 -->
+      <div class="q-screen" id="q6">
+        <p class="q-eyebrow">Question 7 of 7</p>
+        <p class="q-text">What is the legacy you most want to leave behind?</p>
+        <p class="q-note">Choose the one that feels most true.</p>
+        <div class="options-list">
+          <div class="opt" onclick="QDH.pick(6,0,'A')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">Proof that faith is possible even when the body fails and God is still good.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(6,1,'B')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">Evidence that no one is too broken, too far gone, or too late to be restored.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(6,2,'C')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">Courage for every woman fighting invisible wars who believes no one sees her.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(6,3,'D')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">Permission for every woman to choose herself without guilt in any season of life.</span>
+          </div>
+          <div class="opt" onclick="QDH.pick(6,4,'E')">
+            <div class="opt-dot"></div>
+            <span class="opt-text">A voice that speaks boldly into the space she was always told to stay small in.</span>
+          </div>
+        </div>
+        <button class="btn-next" id="next6" onclick="QDH.advance(6)">See My Story Archetype &rarr;</button>
+      </div>
+
+    </div><!-- /questions-wrap -->
+
+    <!-- RESULTS SCREEN -->
+    <div id="screen-result">
+
+      <div class="result-hero">
+        <span class="result-eyebrow">Your Story Archetype</span>
+        <span class="result-icon" id="result-icon">👑</span>
+        <div class="result-name" id="result-name">The Overcomer</div>
+        <div class="result-tagline" id="result-tagline">Survival is your superpower.</div>
+        <div class="result-greeting" id="result-greeting"></div>
+      </div>
+
+      <div class="result-section">
+        <span class="result-section-title">Your Story</span>
+        <p id="result-story"></p>
+      </div>
+
+      <div class="result-section">
+        <span class="result-section-title">Who Needs Your Story</span>
+        <p id="result-who"></p>
+      </div>
+
+      <div class="result-section">
+        <span class="result-section-title">Why You Have Been Hiding It</span>
+        <p id="result-hiding"></p>
+      </div>
+
+      <div class="result-section">
+        <span class="result-section-title">Your Next Steps, Queen</span>
+        <ul class="result-steps" id="result-steps"></ul>
+      </div>
+
+      <!-- TESTIMONIAL -->
+      <div class="testimonial-pull">
+        <p>"Within 48 hours she did what she had not been able to do in 11 months."</p>
+        <cite>Lurlean Peeples, Gathered Crowns LLC</cite>
+      </div>
+
+      <!-- OFFER BLOCK -->
+      <div class="offer-block">
+        <span class="offer-eyebrow">Your Next Step, Queen</span>
+        <h2 class="offer-headline">You Have Just Completed Step 0.<br><em>Now It Is Time to Tell It.</em></h2>
+        <p class="offer-body">You know which story archetype you carry. Now you need to name it, own it, and know exactly what to do with it. That is what the Legacy Story Activation does in three short sessions.</p>
+
+        <ul class="offer-includes">
+          <li>Session 1: Why You Have Been Hiding. And Why That Ends Today.</li>
+          <li>Session 2: The Three Stories Living Inside You Right Now.</li>
+          <li>Session 3: From Story to Strategy. Your Legacy Roadmap.</li>
+          <li>Audio files for all three sessions.</li>
+          <li>The 22-Page Legacy Story Activation Workbook.</li>
+        </ul>
+
+        <div class="offer-divider"></div>
+
+        <span class="offer-price">$27</span>
+        <p class="offer-price-note">Early bird price for the first 50 buyers. Price goes to $47 after that.</p>
+
+        <a href="https://qbeglobalempire.systeme.io/02d7125e" class="offer-btn">Yes. I Am Ready. Give Me Access for $27 &rarr;</a>
+        <p class="offer-security">Secure checkout. Instant delivery to your inbox. Queens don't hide.</p>
+      </div>
+
+      <span class="retake-link" onclick="QDH.retake()">Retake the quiz</span>
+
+    </div><!-- /screen-result -->
+
+  </div><!-- /quiz-card -->
+
+</div><!-- /quiz-shell -->
+
+<script>
+// ── CAPTURE FIRST NAME FROM URL ──
+function getUrlParam(key) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(key) || '';
+}
+const firstName = getUrlParam('first_name') || getUrlParam('fname') || getUrlParam('name') || '';
+const queenName = firstName ? ('Queen ' + firstName.trim()) : 'Queen';
+
+// ── ARCHETYPE DATA ──
+const ARCHETYPES = {
+  A: {
+    icon: '⚔️',
+    name: 'The Overcomer',
+    tagline: 'Survival is your superpower.',
+    greeting: `${queenName}, you did not just survive. You carried others through the fire while burning yourself.`,
+    story: 'Your story is one of impossible endurance. You have lived with battles most people cannot imagine. Chronic illness, physical suffering, a body that tested your faith every single day. And yet here you are. Still standing. Still believing. Still showing up with a grace that confounds everyone watching.',
+    who: 'Women who are in the middle of their suffering right now need to see your story. They need to know that faith can sustain what medicine cannot fix. That a diagnosis is not a death sentence on your calling.',
+    hiding: 'You have been afraid that sharing your illness will make people pity you or see you as weak. But your scars are not your shame. They are your most powerful credentials.',
+    steps: [
+      'Name your health story out loud. The raw, real version you have never fully said.',
+      'Write the three moments your illness tried to stop you and could not.',
+      'Identify the woman who is where you were five years ago. She is your reader.',
+      'Your next step: The Legacy Story Activation will show you exactly how to structure this story.'
+    ]
+  },
+  B: {
+    icon: '🔥',
+    name: 'The Phoenix',
+    tagline: 'Resurrection is your testimony.',
+    greeting: `${queenName}, you have risen from the ashes. And the women still in the fire need to see your after.`,
+    story: 'Your story is one of radical restoration. You know what it means to lose everything. The marriage, the business, the identity, the season that took everything you thought was permanent. And then you did the unthinkable. You rebuilt. Not perfectly. Not quickly. But you rebuilt.',
+    who: 'Women whose worlds have just collapsed need your story more than almost anything else. They need proof that there is life on the other side. That the wreckage is not the ending.',
+    hiding: 'You have been carrying shame about the mess that came before the comeback. But the mess is not the point. The rising is. And women need to see the full picture, not just the beautiful after.',
+    steps: [
+      'Write down the three things you lost in your lowest season.',
+      'Name the moment you decided to rise. What shifted?',
+      'Identify the woman still standing in her rubble. She is waiting for your story.',
+      'Your next step: The Legacy Story Activation will help you turn this journey into a message.'
+    ]
+  },
+  C: {
+    icon: '🛡️',
+    name: 'The Warrior',
+    tagline: 'Your invisible battles are your greatest ministry.',
+    greeting: `${queenName}, you fought wars no one around you fully saw. And you won in silence.`,
+    story: 'Your battles were not loud or dramatic. They were quiet, grinding, and invisible. Caregiving through exhaustion. Chronic struggles no one acknowledged. Silent suffering inside a life that looked fine from the outside. You fought without applause, without witness.',
+    who: 'Women who are fighting invisible wars right now and feel completely alone need to hear from someone who fought unseen and is still here to talk about it.',
+    hiding: 'You have been telling yourself that your battles were too ordinary, too quiet to write about. But the women fighting the same invisible wars are desperate for proof that someone like them made it through.',
+    steps: [
+      'List the invisible battles you fought that most people never fully knew.',
+      'Name the woman still in the middle of that same invisible war. She is your reader.',
+      'Write what you wish someone had said to you in your hardest season.',
+      'Your next step: The Legacy Story Activation will show you how to bring your Warrior story into the light.'
+    ]
+  },
+  D: {
+    icon: '🌅',
+    name: 'The Awakened Queen',
+    tagline: 'Your midlife is your moment.',
+    greeting: `${queenName}, you woke up. And now you cannot go back to sleep.`,
+    story: 'Your story is one of awakening. Somewhere in midlife you looked in the mirror and did not recognize the woman looking back. Not because something terrible happened. But because you realized you had been living for everyone else and had lost yourself completely. And then something shifted.',
+    who: 'Women who are standing at the edge of their own awakening need to see your story. They need permission to choose themselves. To stop apologizing for wanting more.',
+    hiding: 'You have been afraid to take up space. Afraid that wanting more for yourself is selfish. Afraid that stepping into your own lane means betraying the role you have faithfully played. But your awakening is not a betrayal. It is an assignment.',
+    steps: [
+      'Describe the moment you first realized you had lost yourself.',
+      'Name the permission you finally gave yourself that changed everything.',
+      'Identify the woman still waiting for that permission. She is your reader.',
+      'Your next step: The Legacy Story Activation will help you structure your awakening into a message.'
+    ]
+  },
+  E: {
+    icon: '✨',
+    name: 'The Hidden Minister',
+    tagline: 'Your calling has been waiting long enough.',
+    greeting: `${queenName}, God did not just call your husband. He called you too. And it is time.`,
+    story: 'Your story is one of faithful service in the shadows. Decades of ministry behind the scenes. Supporting the vision, carrying the weight, showing up for everyone else. And all the while, there has been something burning inside you that has never fully had its moment.',
+    who: 'Women who are faithfully serving in the background and quietly dying inside need to see that it is possible to step forward without betraying their calling or their family.',
+    hiding: 'You have been afraid that stepping into your own voice will disrupt the structure you have faithfully maintained. That it will look like ambition or disobedience. But God placed that message inside you on purpose. And burying it is not humility. It is disobedience.',
+    steps: [
+      'Name the message that has been burning inside you that you have never fully said out loud.',
+      'Write down three moments God confirmed this calling even when you were not looking.',
+      'Identify the woman in ministry who is where you were. She needs your story.',
+      'Your next step: The Legacy Story Activation will help you step from behind the scenes into your own voice.'
+    ]
+  }
+};
+
+// ── QUIZ ENGINE ──
+const QDH = {
+  qi: 0,
+  ans: [],
+  total: 7,
+
+  startQuiz() {
+    document.getElementById('screen-intro').style.display = 'none';
+    document.getElementById('progress-wrap').style.display = 'block';
+    document.getElementById('questions-wrap').style.display = 'block';
+    this.showQ(0);
+  },
+
+  showQ(i) {
+    document.querySelectorAll('.q-screen').forEach(s => s.classList.remove('active'));
+    const q = document.getElementById('q' + i);
+    if (q) {
+      q.classList.add('active');
+      this.updateProgress(i);
+    }
+  },
+
+  updateProgress(i) {
+    const pct = Math.round((i / this.total) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-count').textContent = 'Question ' + (i + 1) + ' of ' + this.total;
+  },
+
+  pick(qi, optIdx, val) {
+    this.ans[qi] = val;
+    const opts = document.querySelectorAll('#q' + qi + ' .opt');
+    opts.forEach((o, i) => {
+      o.classList.toggle('chosen', i === optIdx);
+    });
+    const btn = document.getElementById('next' + qi);
+    if (btn) btn.classList.add('ready');
+  },
+
+  advance(qi) {
+    if (!this.ans[qi]) return;
+    const next = qi + 1;
+    if (next >= this.total) {
+      this.showResult();
+    } else {
+      this.showQ(next);
+    }
+  },
+
+  score() {
+    const counts = {A:0, B:0, C:0, D:0, E:0};
+    this.ans.forEach(a => { if (a && counts[a] !== undefined) counts[a]++; });
+    return Object.entries(counts).sort((a,b) => b[1]-a[1])[0][0];
+  },
+
+  showResult() {
+    // Hide quiz UI
+    document.getElementById('progress-wrap').style.display = 'none';
+    document.getElementById('questions-wrap').style.display = 'none';
+
+    // Get archetype
+    const key = this.score();
+    const ar = ARCHETYPES[key];
+
+    // Populate result
+    document.getElementById('result-icon').textContent = ar.icon;
+    document.getElementById('result-name').textContent = ar.name;
+    document.getElementById('result-tagline').textContent = ar.tagline;
+    document.getElementById('result-greeting').textContent = ar.greeting;
+    document.getElementById('result-story').textContent = ar.story;
+    document.getElementById('result-who').textContent = ar.who;
+    document.getElementById('result-hiding').textContent = ar.hiding;
+
+    const stepsList = document.getElementById('result-steps');
+    stepsList.innerHTML = ar.steps.map(s => `<li>${s}</li>`).join('');
+
+    // Show result
+    const resultEl = document.getElementById('screen-result');
+    resultEl.style.display = 'block';
+    resultEl.classList.add('active');
+
+    // Scroll to top of card
+    setTimeout(() => {
+      document.querySelector('.quiz-card').scrollIntoView({behavior:'smooth', block:'start'});
+    }, 100);
+  },
+
+  retake() {
+    this.qi = 0;
+    this.ans = [];
+    document.querySelectorAll('.opt').forEach(o => o.classList.remove('chosen'));
+    document.querySelectorAll('.btn-next').forEach(b => b.classList.remove('ready'));
+    document.getElementById('screen-result').style.display = 'none';
+    document.getElementById('screen-result').classList.remove('active');
+    document.getElementById('screen-intro').style.display = 'block';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+};
+</script>
+
+</body>
+</html>
